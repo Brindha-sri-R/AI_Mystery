@@ -1,6 +1,6 @@
-import mongoose from "mongoose";import app from "./app.js";import {env} from "./config/env.js";
+import app from "./app.js";import {env} from "./config/env.js";import {connectDatabase} from "./database.js";
 try{
- await mongoose.connect(env.MONGODB_URI);
+ await connectDatabase();
  app.listen(env.PORT,()=>console.log(`AI Mystery Room API listening on ${env.PORT}`));
 }catch(error){
  console.error("MongoDB is unavailable. Check that MONGODB_URI points to a reachable database and that its network access list permits this server.");
