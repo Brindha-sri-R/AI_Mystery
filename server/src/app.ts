@@ -1,7 +1,8 @@
 import express,{type NextFunction,type Request,type Response} from "express";
+import { resolve } from "node:path";
 import cors from "cors";import helmet from "helmet";import cookieParser from "cookie-parser";import {rateLimit} from "express-rate-limit";import {randomBytes,createHash} from "node:crypto";import mongoose from "mongoose";
 import {createCaseSchema,publicCaseSchema,type PublicCase,type CaseResult} from "@mystery/shared";import {env} from "./config/env.js";import {CaseModel} from "./models/Case.model.js";import {generateCase} from "./services/ai/caseGenerator.js";
-const app=express();app.disable("x-powered-by");app.use(helmet());app.use(cors({origin:env.CLIENT_ORIGIN,credentials:true}));app.use(express.json({limit:"16kb"}));app.use(cookieParser());
+const app=express();app.disable("x-powered-by");app.use(helmet({contentSecurityPolicy:{directives:{"style-src":["'self'","'unsafe-inline'","https://fonts.googleapis.com"],"font-src":["'self'","https://fonts.gstatic.com"]}}}));if(env.NODE_ENV!=="production")app.use(cors({origin:env.CLIENT_ORIGIN,credentials:true}));app.use(express.json({limit:"16kb"}));app.use(cookieParser());
 app.use((req,res,next)=>{res.setHeader("X-Request-Id",randomBytes(8).toString("hex"));next();});
 const limiter=rateLimit({windowMs:env.RATE_LIMIT_WINDOW_MS,limit:env.RATE_LIMIT_MAX_REQUESTS,standardHeaders:true,legacyHeaders:false});app.use("/api/v1/cases",limiter);
 function session(req:Request,res:Response){let token=req.cookies?.mystery_session as string|undefined;if(!token){token=randomBytes(32).toString("base64url");res.cookie("mystery_session",token,{httpOnly:true,sameSite:"lax",secure:env.NODE_ENV==="production",maxAge:1000*60*60*24*30,path:"/"});}return createHash("sha256").update(token).digest("hex");}
@@ -12,5 +13,13 @@ app.post("/api/v1/cases/:caseId/accusation",async(req,res,next)=>{try{const hash
  const latest=await CaseModel.findOne({_id:req.params.caseId,ownerSessionHash:hash}).select("+privateSolution");if(!latest?.accusation)return res.status(409).json({error:{code:"CASE_ALREADY_SUBMITTED",message:"An accusation has already been submitted."}});if(latest.accusation.selectedSuspectId!==suspectId)return res.status(409).json({error:{code:"CASE_ALREADY_SUBMITTED",message:"This case already has a final accusation."}});res.json({result:await reveal(latest)});
 }catch(e){next(e);}});
 async function reveal(doc:any):Promise<CaseResult|null>{if(!doc.accusation)return null;const data=doc.publicCase as PublicCase;const solution=doc.privateSolution as any;const culprit=data.suspects.find(s=>s.id===solution.culpritId);if(!culprit)return null;return{isCorrect:doc.accusation.isCorrect,selectedSuspectId:doc.accusation.selectedSuspectId,culprit:{id:culprit.id,name:culprit.name,profile:culprit.profile},motive:solution.motive,opportunity:solution.opportunity,reconstruction:solution.reconstruction,reasoning:solution.reasoning,redHerringExplanation:solution.redHerringExplanation};}
+if(env.NODE_ENV==="production"){
+ const clientDist=resolve(process.cwd(),"client","dist");
+ app.use(express.static(clientDist,{index:false}));
+ app.get("*",(req,res,next)=>{
+  if(req.path.startsWith("/api/"))return next();
+  res.sendFile(resolve(clientDist,"index.html"),(error)=>{if(error)next(error);});
+ });
+}
 app.use((err:unknown,_req:Request,res:Response,_next:NextFunction)=>{const error=err as {status?:number;code?:string;message?:string;issues?:unknown};if(error.issues)return res.status(400).json({error:{code:"VALIDATION_ERROR",message:"Please check your story and settings."}});const status=error.status||500;res.status(status).json({error:{code:error.code||"INTERNAL_ERROR",message:status>=500?(error.message||"Something went wrong. Please try again."):error.message}});});
 export default app;
