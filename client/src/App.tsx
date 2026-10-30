@@ -1,0 +1,386 @@
+﻿import {useEffect, useMemo, useState, type FormEvent, type ReactNode} from "react";
+import {Link, Route, Routes, useNavigate, useParams} from "react-router-dom";
+import {
+  ArrowLeft, ArrowRight, ArrowUpRight, BadgeCheck, Check, ChevronDown, Clock3,
+  Eye, FileText, Fingerprint, Image as ImageIcon, LockKeyhole, MapPin,
+  MessageSquare, Moon, Radio, Search, Shield, Sparkles, UserRound, Video, X,
+  type LucideIcon,
+} from "lucide-react";
+import {api} from "./lib/api";
+import type {CaseResult, EvidenceItem, EvidenceType, PublicCase} from "@mystery/shared";
+import {BlackoutTransition, PointerGlow, resolveScene, SceneArtwork} from "./components/Atmosphere";
+
+const evidenceIcons: Record<EvidenceType, LucideIcon> = {
+  chat: MessageSquare,
+  witness: UserRound,
+  timeline: Clock3,
+  image: ImageIcon,
+  cctv_log: Video,
+  physical: Fingerprint,
+  document: FileText,
+};
+
+const evidenceOptions: {id: EvidenceType; label: string; icon: LucideIcon}[] = [
+  {id: "chat", label: "Messages", icon: MessageSquare},
+  {id: "cctv_log", label: "Camera logs", icon: Video},
+  {id: "image", label: "Still images", icon: ImageIcon},
+  {id: "witness", label: "Witnesses", icon: UserRound},
+  {id: "physical", label: "Physical clues", icon: Fingerprint},
+  {id: "document", label: "Documents", icon: FileText},
+];
+
+const wait = (duration: number) => new Promise(resolve => window.setTimeout(resolve, duration));
+
+function Brand() {
+  return (
+    <Link className="brand" to="/" aria-label="Mystery Room home">
+      <span className="brand-mark"><Eye size={17}/></span>
+      <span className="brand-wording">MYSTERY ROOM<span className="brand-sub">THE NIGHT SHIFT</span></span>
+    </Link>
+  );
+}
+
+function Header() {
+  return (
+    <header className="header">
+      <Brand/>
+      <div className="header-right">
+        <span className="privacy"><LockKeyhole size={13}/> PRIVATE CASE FILES</span>
+        <span className="header-dot" aria-hidden="true"/>
+        <Link to="/#how-it-works">HOW TO INVESTIGATE</Link>
+      </div>
+    </header>
+  );
+}
+
+function FictionNotice() {
+  return (
+    <div className="fiction-notice">
+      <span className="notice-pulse" aria-hidden="true"/>
+      <span>EVERY CASE IS FICTIONAL</span>
+      <span className="notice-divider" aria-hidden="true">/</span>
+      <span>EVERY CLUE IS AI-GENERATED</span>
+    </div>
+  );
+}
+
+function Layout({children}: {children: ReactNode}) {
+  return (
+    <div className="app-shell">
+      <PointerGlow/>
+      <div className="ambient-grain" aria-hidden="true"/>
+      <Header/>
+      {children}
+      <footer className="footer">
+        <Brand/>
+        <span className="footer-thought">The dark keeps no secrets forever.</span>
+        <span className="footer-mark">FICTION ONLY · 2026</span>
+      </footer>
+    </div>
+  );
+}
+
+function Eyebrow({children}: {children: ReactNode}) {
+  return <div className="eyebrow"><span className="eyebrow-line" aria-hidden="true"/>{children}</div>;
+}
+
+function Landing() {
+  return (
+    <Layout>
+      <main>
+        <section className="hero">
+          <div className="hero-copy">
+            <Eyebrow>THE CASE IS YOURS TO SOLVE</Eyebrow>
+            <h1>Some stories<br/>refuse to <em>stay buried.</em></h1>
+            <p className="hero-text">Give us a premise. We’ll send you into a fictional investigation full of suspects, strange evidence, and one truth waiting in the dark.</p>
+            <Link to="/create" className="button button-primary">Enter the mystery <ArrowRight size={17}/></Link>
+            <div className="hero-meta">
+              <span><span className="meta-dot" aria-hidden="true"/> A new case, written from your idea</span>
+              <span>5—10 MINUTES</span>
+            </div>
+          </div>
+          <div className="hero-visual" aria-label="Illustration of a fictional observatory at night">
+            <SceneArtwork scene="observatory"/>
+            <div className="visual-vignette" aria-hidden="true"/>
+            <div className="visual-stamp"><Moon size={12}/> OPEN AFTER DARK</div>
+            <div className="hero-file-card">
+              <div className="file-card-top"><span>UNSOLVED / 001</span><span className="status-signal"><i/> OPEN</span></div>
+              <div className="file-card-rule"/>
+              <span className="file-card-kicker">A FICTIONAL CASE FILE</span>
+              <h2>The star chart<br/>that vanished</h2>
+              <div className="file-card-bottom"><span><Fingerprint size={13}/> 05 PERSONS</span><span><Search size={13}/> 08 CLUES</span></div>
+            </div>
+            <div className="floating-clue clue-message"><span><MessageSquare size={13}/> MESSAGE 04</span><b>“I never left the west wing.”</b></div>
+            <div className="floating-clue clue-signal"><span><Radio size={13}/> CAMERA LOG</span><b>21:40 · SIGNAL LOST</b></div>
+            <div className="visual-caption"><span>AN ATMOSPHERE BUILT AROUND YOUR STORY</span><span>NO. 01 / 03</span></div>
+          </div>
+          <div className="hero-index">01 <span>—</span> 03</div>
+        </section>
+
+        <section className="ticker" aria-label="Investigation steps">
+          <span>LOOK CLOSER</span><i>✳</i><span>QUESTION EVERYTHING</span><i>✳</i><span>FOLLOW THE TRACE</span><i>✳</i><span>NAME THE TRUTH</span>
+        </section>
+
+        <section id="how-it-works" className="process section-wrap">
+          <div className="section-kicker">YOUR INVESTIGATION BEGINS HERE <span>01 — 03</span></div>
+          <div className="process-head">
+            <h2>One seed.<br/><em>A thousand shadows.</em></h2>
+            <p>Every case begins with your idea. Follow the evidence, trust your instincts, and decide who you believe before the room goes quiet.</p>
+          </div>
+          <div className="steps">
+            <article><span className="step-no">01</span><Sparkles/><h3>Set the scene</h3><p>A person, a place, a feeling that something is wrong. That’s enough to begin.</p></article>
+            <article><span className="step-no">02</span><Fingerprint/><h3>Study what’s left</h3><p>Meet the suspects. Turn over every clue. Notice what does not belong.</p></article>
+            <article><span className="step-no">03</span><BadgeCheck/><h3>Make your accusation</h3><p>Commit to your theory. When the lights return, see if the evidence agrees.</p></article>
+          </div>
+          <div className="process-bottom"><span>NOTHING IN THE FILE IS THERE BY ACCIDENT.</span><Link to="/create">Begin an investigation <ArrowRight size={15}/></Link></div>
+        </section>
+
+        <section className="evidence-preview">
+          <div className="preview-copy">
+            <Eyebrow>THE EVIDENCE BOARD</Eyebrow>
+            <h2>A whisper.<br/>A <em>missing minute.</em></h2>
+            <p>Messages, witness accounts, a camera log that cuts out at the worst possible moment. Each detail is a thread. Decide which ones to pull.</p>
+            <Link to="/create" className="text-link">Build a case around your idea <ArrowRight size={16}/></Link>
+          </div>
+          <div className="preview-cards" aria-label="Examples of fictional clues">
+            <article className="preview-card card-note"><span className="card-label"><MessageSquare size={13}/> MESSAGE LOG <i>ITEM 02</i></span><p>“I thought the east door was still locked.”</p><small>UNSENT · 9:14 PM</small></article>
+            <article className="preview-card card-log"><span className="card-label"><Video size={13}/> SIMULATED CAMERA LOG <i>ITEM 05</i></span><div className="log-row"><i/>21:32:08 <span>Hallway clear</span></div><div className="log-row"><i/>21:40:51 <span>Motion detected</span></div><div className="log-row faded"><i/>21:42:16 <span>Signal restored</span></div></article>
+            <article className="preview-card card-evidence"><span className="card-label"><FileText size={13}/> CONSERVATION NOTE <i>ITEM 07</i></span><p>Varnish sample inconsistent with the restoration log dated Tuesday.</p><div className="doc-line"/><div className="doc-line short"/></article>
+          </div>
+        </section>
+
+        <section className="final-cta">
+          <Eyebrow>YOUR CASE IS WAITING</Eyebrow>
+          <h2>Have a story that<br/>doesn’t <em>let you sleep?</em></h2>
+          <Link to="/create" className="button button-primary">Put it to the test <ArrowRight size={17}/></Link>
+          <span className="cta-note"><LockKeyhole size={13}/> Private to your browser session · Fictional by design</span>
+        </section>
+      </main>
+      <FictionNotice/>
+    </Layout>
+  );
+}
+
+function CreateCasePage() {
+  const navigate = useNavigate();
+  const [seed, setSeed] = useState("");
+  const [setting, setSetting] = useState("Let AI decide");
+  const [tone, setTone] = useState("Psychological suspense");
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [preferences, setPreferences] = useState<EvidenceType[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const scene = useMemo(() => resolveScene(`${seed} ${setting}`), [seed, setting]);
+  const trimmedLength = seed.trim().length;
+
+  function togglePreference(value: EvidenceType) {
+    setPreferences(current => current.includes(value) ? current.filter(item => item !== value) : [...current, value]);
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (trimmedLength < 30 || trimmedLength > 1000) return;
+    setBusy(true);
+    setError("");
+    try {
+      const {case: createdCase} = await api.create({
+        storySeed: seed.trim(),
+        setting,
+        tone,
+        difficulty,
+        evidencePreferences: preferences,
+      });
+      sessionStorage.setItem(`case:${createdCase.id}`, JSON.stringify(createdCase));
+      await wait(700);
+      navigate(`/case/${createdCase.id}`);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "The case did not open. Please try again.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Layout>
+      <main className="create-page">
+        <aside className="create-aside">
+          <Link to="/" className="back-link"><ArrowLeft size={14}/> BACK TO THE ROOM</Link>
+          <div className="create-scene"><SceneArtwork scene={scene} compact/><div className="scene-caption"><Eye size={13}/> THE SCENE WILL TAKE SHAPE AROUND YOUR WORDS</div></div>
+          <Eyebrow>THE BEGINNING OF A CASE</Eyebrow>
+          <h1>Leave us<br/>the <em>first clue.</em></h1>
+          <p>Start with a premise. We’ll build a complete fictional investigation around it.</p>
+          <div className="aside-note"><span className="note-icon"><Shield size={17}/></span><div><b>Fiction from the first line.</b><span>Your seed is treated as story material. Names, places, and evidence are invented.</span></div></div>
+          <div className="aside-steps"><span><i>01</i> Write the seed</span><span><i>02</i> Choose the mood</span><span><i>03</i> Enter the dark</span></div>
+        </aside>
+
+        <form className="create-form" onSubmit={submit}>
+          <div className="form-head"><span>CASE CREATION <i>·</i> STEP 01</span><span className="required-label">* REQUIRED</span></div>
+          <label htmlFor="seed">Your story seed <span>What happened?</span></label>
+          <textarea id="seed" value={seed} onChange={event => setSeed(event.target.value)} placeholder="A celebrated botanist vanishes during the opening night of a greenhouse that only blooms after dark…" maxLength={1000} aria-describedby="seed-help seed-count"/>
+          <div className="textarea-foot"><small id="seed-help">A person, a place, or the thing that feels wrong.</small><span id="seed-count" className={trimmedLength > 1000 ? "over" : ""}>{seed.length}<i> / 1,000</i></span></div>
+          {trimmedLength > 0 && trimmedLength < 30 && <p className="field-error">Give the mystery a little more room — at least 30 characters.</p>}
+
+          <div className="form-grid">
+            <div className="field"><label htmlFor="setting">Setting</label><div className="select-wrap"><select id="setting" value={setting} onChange={event => setSetting(event.target.value)}>{["Let AI decide", "Mansion", "Office", "Hotel", "College", "Museum", "Small town"].map(option => <option key={option}>{option}</option>)}</select><ChevronDown size={15}/></div></div>
+            <div className="field"><label htmlFor="tone">Tone</label><div className="select-wrap"><select id="tone" value={tone} onChange={event => setTone(event.target.value)}>{["Classic detective", "Psychological suspense", "Cozy mystery", "Noir", "Lighthearted"].map(option => <option key={option}>{option}</option>)}</select><ChevronDown size={15}/></div></div>
+          </div>
+
+          <fieldset className="difficulty-field"><legend>Difficulty <span>How closely will you need to look?</span></legend><div className="difficulty-options">{([["easy", "A few guiding lights"], ["medium", "A fair challenge"], ["hard", "Every detail matters"]] as const).map(([value, description]) => <button className={difficulty === value ? "difficulty active" : "difficulty"} type="button" onClick={() => setDifficulty(value)} key={value} aria-pressed={difficulty === value}><span>{value}</span><small>{description}</small>{difficulty === value && <Check size={13}/>}</button>)}</div></fieldset>
+
+          <fieldset className="evidence-field"><legend>What should the evidence feel like? <span>Optional · choose any</span></legend><div className="evidence-preferences">{evidenceOptions.map(({id, label, icon: Icon}) => <button className={preferences.includes(id) ? "preference-chip selected" : "preference-chip"} type="button" key={id} onClick={() => togglePreference(id)} aria-pressed={preferences.includes(id)}><Icon size={14}/>{label}</button>)}</div></fieldset>
+
+          {error && <div className="error-box" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
+          <button disabled={busy || trimmedLength < 30 || trimmedLength > 1000} className="button button-primary form-submit" type="submit">{busy ? <><span className="spinner"/> The case is opening…</> : <>Enter the dark <ArrowRight size={17}/></>}</button>
+          <p className="form-foot"><LockKeyhole size={13}/> Generation can take a moment. Your case stays in this session.</p>
+        </form>
+      </main>
+      <FictionNotice/>
+      {busy && <BlackoutTransition kind="create" scene={scene} subject={seed.trim().slice(0, 70)}/>}
+    </Layout>
+  );
+}
+
+function SectionLabel({children, detail}: {children: ReactNode; detail?: ReactNode}) {
+  return <div className="section-label"><span>{children}</span>{detail && <i>{detail}</i>}</div>;
+}
+
+function ResultReveal({result, caseData}: {result: CaseResult; caseData: PublicCase}) {
+  const selectedSuspect = caseData.suspects.find(suspect => suspect.id === result.selectedSuspectId);
+  return (
+    <section className={`result-panel ${result.isCorrect ? "result-panel--solved" : "result-panel--misread"}`} aria-live="polite">
+      <div className="result-topline"><span className={`result-stamp ${result.isCorrect ? "correct" : "incorrect"}`}>{result.isCorrect ? "CASE SOLVED" : "WRONG ACCUSATION"}</span><span className="result-index">THE REVEAL / 01</span></div>
+      <div className="result-verdict-icon">{result.isCorrect ? <BadgeCheck size={24}/> : <Eye size={24}/>}</div>
+      <p className="result-kicker">{result.isCorrect ? "YOU READ THE ROOM" : "THE ROOM MISLED YOU"}</p>
+      <h2>{result.isCorrect ? <>You found the <em>truth.</em></> : <>You were <em>wrong.</em></>}</h2>
+      <p className="result-outcome">{result.isCorrect ? "Your accusation was right." : `Your accusation against ${selectedSuspect?.name ?? "your suspect"} was not right.`}</p>
+      <div className="culprit-reveal"><span>THE CULPRIT WAS</span><b>{result.culprit.name}</b><small>{result.culprit.profile}</small></div>
+      <p className="result-lede">{result.motive} {result.opportunity}</p>
+      <div className="reconstruction"><span>HOW IT HAPPENED</span><p>{result.reconstruction}</p></div>
+      <div className="reasoning-list"><SectionLabel detail="EVIDENCE REVISITED">THE CLUES THAT MATTERED</SectionLabel>{result.reasoning.map((item, index) => {
+        const evidence = caseData.evidence.find(entry => entry.id === item.evidenceId);
+        return <article key={item.evidenceId}><b>0{index + 1}<i>{evidence?.title ?? item.evidenceId}</i></b><p>{item.explanation}</p></article>;
+      })}</div>
+      <div className="red-herring"><span>THE RED HERRING</span><p>{result.redHerringExplanation}</p></div>
+      <Link to="/create" className="button button-primary">Open another case <ArrowRight size={17}/></Link>
+      <p className="result-fiction"><Shield size={13}/> This mystery and all its evidence are fictional.</p>
+    </section>
+  );
+}
+
+function EvidenceDialog({item, caseData, onClose}: {item: EvidenceItem; caseData: PublicCase; onClose: () => void}) {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+  const relatedNames = item.relatedSuspectIds.map(id => caseData.suspects.find(suspect => suspect.id === id)?.name).filter(Boolean);
+  const Icon = evidenceIcons[item.type];
+  return (
+    <div className="overlay" role="presentation" onMouseDown={event => {if (event.target === event.currentTarget) onClose();}}>
+      <div className="evidence-dialog" role="dialog" aria-modal="true" aria-labelledby="evidence-title">
+        <button className="close-dialog" onClick={onClose} aria-label="Close evidence"><X size={18}/></button>
+        <div className="dialog-icon"><Icon size={17}/></div>
+        <SectionLabel detail={item.id.replace("_", " ").toUpperCase()}>{item.sourceLabel.toUpperCase()}</SectionLabel>
+        <h2 id="evidence-title">{item.title}</h2><p className="evidence-summary">{item.summary}</p>
+        <div className="evidence-paper"><span className="paper-label">TRANSCRIPT / FICTIONAL RECORD</span>{item.content}</div>
+        <div className="related"><b>CONNECTED TO</b><span>{relatedNames.join(" · ") || "No named persons"}</span></div>
+      </div>
+    </div>
+  );
+}
+
+function CaseRoom() {
+  const {id = ""} = useParams();
+  const [caseData, setCaseData] = useState<PublicCase | null>(null);
+  const [result, setResult] = useState<CaseResult | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [selected, setSelected] = useState("");
+  const [evidence, setEvidence] = useState<EvidenceItem | null>(null);
+  const [confirm, setConfirm] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    const cacheKey = `case:${id}`;
+    try {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) setCaseData(JSON.parse(cached) as PublicCase);
+    } catch {
+      sessionStorage.removeItem(cacheKey);
+    }
+    api.get(id).then(({case: loadedCase, result: loadedResult}) => {
+      if (!active) return;
+      setCaseData(loadedCase);
+      sessionStorage.setItem(cacheKey, JSON.stringify(loadedCase));
+      if (loadedResult) setResult(loadedResult);
+    }).catch(requestError => {
+      if (active && !caseData) setError(requestError instanceof Error ? requestError.message : "This case is unavailable.");
+    }).finally(() => {if (active) setInitialLoading(false);});
+    return () => {active = false;};
+  }, [id]);
+
+  const scene = useMemo(() => caseData ? resolveScene([caseData.setting, caseData.title, caseData.briefing.location, caseData.briefing.incident].join(" ")) : "unknown", [caseData]);
+
+  async function accuse() {
+    if (!selected || busy) return;
+    setBusy(true);
+    setError("");
+    setConfirm(false);
+    try {
+      const {result: revealed} = await api.accuse(id, selected);
+      setResult(revealed);
+      await wait(900);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Your accusation could not be recorded. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (initialLoading && !caseData) return <Layout><div className="loading-case"><span className="spinner"/> The case file is opening…</div></Layout>;
+  if (error && !caseData) return <Layout><div className="empty-state"><span>CASE FILE NOT FOUND</span><h1>That trail ends here.</h1><p>{error}</p><Link to="/" className="button button-primary">Return to the room <ArrowRight size={16}/></Link></div></Layout>;
+  if (!caseData) return null;
+
+  return (
+    <Layout>
+      <main className={`investigation scene-theme scene-theme--${scene}`}>
+        <div className="case-top"><Link to="/" className="back-link"><ArrowLeft size={14}/> EXIT CASE</Link><span className="case-status"><i aria-hidden="true"/>{result ? "CASE CLOSED" : "INVESTIGATION OPEN"}</span><span className="case-number">FILE / {id.slice(-6).toUpperCase()}</span></div>
+        <section className="case-heading">
+          <div className="case-heading__art"><SceneArtwork scene={scene} compact/></div>
+          <div className="case-heading__content"><Eyebrow><span>{caseData.setting.toUpperCase()}</span><b>/</b><span>{caseData.difficulty.toUpperCase()} CASE</span></Eyebrow><h1>{caseData.title}</h1><p>{caseData.briefing.incident}</p><div className="case-location"><MapPin size={13}/>{caseData.briefing.location}<span>·</span>{caseData.briefing.timeWindow}</div></div>
+          <div className="case-heading__seal"><Eye size={15}/><span>FICTIONAL<br/>CASE MATERIAL</span></div>
+        </section>
+
+        {result ? <ResultReveal result={result} caseData={caseData}/> : (
+          <div className="case-columns">
+            <div className="case-main">
+              <section className="case-brief dossier-panel"><SectionLabel detail="01">THE BRIEFING</SectionLabel><ul>{caseData.briefing.knownFacts.map((fact, index) => <li key={`${index}-${fact}`}><span>{String(index + 1).padStart(2, "0")}</span>{fact}</li>)}</ul></section>
+              <section className="suspects dossier-panel"><SectionLabel detail={`${String(caseData.suspects.length).padStart(2, "0")} PERSONS`}>PERSONS OF INTEREST</SectionLabel><div className="suspect-list">{caseData.suspects.map((suspect, index) => {
+                const isSelected = selected === suspect.id;
+                return <article className={`suspect-card${isSelected ? " suspect-card--selected" : ""}`} key={suspect.id}><div className="suspect-card__top"><span className="suspect-no">0{index + 1}</span><button className="suspect-select" type="button" onClick={() => setSelected(isSelected ? "" : suspect.id)} aria-pressed={isSelected} aria-label={`${isSelected ? "Remove" : "Select"} ${suspect.name} for accusation`}>{isSelected ? <Check size={14}/> : <ArrowUpRight size={14}/>}</button></div><h3>{suspect.name}</h3><span className="suspect-role">{suspect.role}</span><p>{suspect.profile}</p><div className="alibi"><span>STATED ALIBI</span>{suspect.alibi}</div></article>;
+              })}</div></section>
+              <section className="timeline dossier-panel"><SectionLabel detail={`${caseData.timeline.length} EVENTS`}>THE TIMELINE</SectionLabel><div className="timeline-list">{caseData.timeline.map((event, index) => <article className="timeline-row" key={event.id}><span className="timeline-time">{event.timestamp}</span><span className="timeline-node" aria-hidden="true"><i/></span><p>{event.description}</p><span className="timeline-index">0{index + 1}</span></article>)}</div></section>
+            </div>
+
+            <aside className="case-sidebar">
+              <section className="evidence-board dossier-panel"><SectionLabel detail={`${String(caseData.evidence.length).padStart(2, "0")} ITEMS`}>EVIDENCE BOARD</SectionLabel><p className="board-hint">Every detail is a thread. Pull carefully.</p>{caseData.evidence.map((item, index) => {const Icon = evidenceIcons[item.type];return <button className="evidence-card" key={item.id} onClick={() => setEvidence(item)}><span className="evidence-index">{String(index + 1).padStart(2, "0")}</span><span className="evidence-icon"><Icon size={16}/></span><span className="evidence-content"><b>{item.title}</b><small>{item.sourceLabel}</small></span><ArrowUpRight className="evidence-open" size={15}/></button>;})}</section>
+              <section className="accusation dossier-panel"><SectionLabel detail="ONE FINAL CHOICE">YOUR THEORY</SectionLabel><p>Who had the motive, the access, and the opportunity?</p><div className="select-wrap"><select aria-label="Select a suspect to accuse" value={selected} onChange={event => setSelected(event.target.value)}><option value="">Choose a person of interest</option>{caseData.suspects.map(suspect => <option key={suspect.id} value={suspect.id}>{suspect.name} — {suspect.role}</option>)}</select><ChevronDown size={15}/></div>{error && <div className="error-box" role="alert">{error}</div>}<button className="button button-primary accuse-btn" type="button" disabled={!selected || busy} onClick={() => setConfirm(true)}>Lock in your accusation <ArrowRight size={16}/></button><small className="final-note"><LockKeyhole size={12}/> This choice is final for this case.</small></section>
+            </aside>
+          </div>
+        )}
+        <FictionNotice/>
+      </main>
+      {confirm && <div className="overlay" role="presentation" onMouseDown={event => {if (event.target === event.currentTarget) setConfirm(false);}}><div className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title"><button className="close-dialog" onClick={() => setConfirm(false)} aria-label="Close confirmation"><X size={18}/></button><Eyebrow>THE FINAL DECISION</Eyebrow><h2 id="confirm-title">Say their name<br/>and <em>mean it.</em></h2><p>This is your one final accusation. When you continue, the case will close and the evidence will answer.</p><button className="button button-primary" type="button" onClick={accuse}>Accuse {caseData.suspects.find(suspect => suspect.id === selected)?.name ?? "this suspect"} <ArrowRight size={16}/></button><button className="cancel-link" type="button" onClick={() => setConfirm(false)}>Not yet — return to the evidence</button></div></div>}
+      {evidence && <EvidenceDialog item={evidence} caseData={caseData} onClose={() => setEvidence(null)}/>}
+      {busy && <BlackoutTransition kind="accuse" scene={scene} subject={caseData.title}/>}
+    </Layout>
+  );
+}
+
+function NotFound() {
+  return <Layout><div className="empty-state"><span>NOT IN THE CASE FILE</span><h1>This page is a dead end.</h1><Link to="/" className="button button-primary">Back to the room <ArrowRight size={16}/></Link></div></Layout>;
+}
+
+export default function App() {
+  return <Routes><Route path="/" element={<Landing/>}/><Route path="/create" element={<CreateCasePage/>}/><Route path="/case/:id" element={<CaseRoom/>}/><Route path="*" element={<NotFound/>}/></Routes>;
+}
