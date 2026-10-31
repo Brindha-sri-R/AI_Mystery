@@ -3,7 +3,7 @@ import {Link, Route, Routes, useNavigate, useParams} from "react-router-dom";
 import {
   ArrowLeft, ArrowRight, ArrowUpRight, BadgeCheck, Check, ChevronDown, Clock3,
   Eye, FileText, Fingerprint, Image as ImageIcon, LockKeyhole, MapPin,
-  MessageSquare, Moon, Radio, Search, Shield, Sparkles, UserRound, Video, X,
+  MessageSquare, Shield, Sparkles, UserRound, Video, X,
   type LucideIcon,
 } from "lucide-react";
 import {api} from "./lib/api";
@@ -35,7 +35,7 @@ function Brand() {
   return (
     <Link className="brand" to="/" aria-label="Mystery Room home">
       <span className="brand-mark"><Eye size={17}/></span>
-      <span className="brand-wording">MYSTERY ROOM<span className="brand-sub">THE NIGHT SHIFT</span></span>
+      <span className="brand-wording">MYSTERY ROOM</span>
     </Link>
   );
 }
@@ -45,9 +45,9 @@ function Header() {
     <header className="header">
       <Brand/>
       <div className="header-right">
-        <span className="privacy"><LockKeyhole size={13}/> PRIVATE CASE FILES</span>
+        <span className="privacy"><LockKeyhole size={13}/> FICTIONAL MYSTERIES</span>
         <span className="header-dot" aria-hidden="true"/>
-        <Link to="/#how-it-works">HOW TO INVESTIGATE</Link>
+        <Link to="/#how-it-works">HOW IT WORKS</Link>
       </div>
     </header>
   );
@@ -57,9 +57,7 @@ function FictionNotice() {
   return (
     <div className="fiction-notice">
       <span className="notice-pulse" aria-hidden="true"/>
-      <span>EVERY CASE IS FICTIONAL</span>
-      <span className="notice-divider" aria-hidden="true">/</span>
-      <span>EVERY CLUE IS AI-GENERATED</span>
+      <span>Fictional mysteries, made from your ideas.</span>
     </div>
   );
 }
@@ -90,70 +88,65 @@ function Landing() {
       <main>
         <section className="hero">
           <div className="hero-copy">
-            <Eyebrow>THE CASE IS YOURS TO SOLVE</Eyebrow>
-            <h1>Some stories<br/>refuse to <em>stay buried.</em></h1>
-            <p className="hero-text">Give us a premise. We’ll send you into a fictional investigation full of suspects, strange evidence, and one truth waiting in the dark.</p>
-            <Link to="/create" className="button button-primary">Enter the mystery <ArrowRight size={17}/></Link>
+            <Eyebrow>A MYSTERY MADE FOR YOU</Eyebrow>
+            <h1>Your idea.<br/>Your <em>mystery.</em></h1>
+            <p className="hero-text">Create a case, follow the clues, and decide who did it.</p>
+            <Link to="/create" className="button button-primary">Create a mystery <ArrowRight size={17}/></Link>
             <div className="hero-meta">
-              <span><span className="meta-dot" aria-hidden="true"/> A new case, written from your idea</span>
-              <span>5—10 MINUTES</span>
+              <span><span className="meta-dot" aria-hidden="true"/> A short, story-driven investigation</span>
             </div>
           </div>
           <div className="hero-visual" aria-label="Illustration of a fictional observatory at night">
             <SceneArtwork scene="observatory"/>
             <div className="visual-vignette" aria-hidden="true"/>
-            <div className="visual-stamp"><Moon size={12}/> OPEN AFTER DARK</div>
             <div className="hero-file-card">
-              <div className="file-card-top"><span>UNSOLVED / 001</span><span className="status-signal"><i/> OPEN</span></div>
+              <div className="file-card-top"><span>CASE FILE</span><span className="status-signal"><i/> OPEN</span></div>
               <div className="file-card-rule"/>
-              <span className="file-card-kicker">A FICTIONAL CASE FILE</span>
+              <span className="file-card-kicker">FICTIONAL MYSTERY</span>
               <h2>The star chart<br/>that vanished</h2>
-              <div className="file-card-bottom"><span><Fingerprint size={13}/> 05 PERSONS</span><span><Search size={13}/> 08 CLUES</span></div>
+              <div className="file-card-bottom"><span>5 suspects</span><span>8 clues</span></div>
             </div>
-            <div className="floating-clue clue-message"><span><MessageSquare size={13}/> MESSAGE 04</span><b>“I never left the west wing.”</b></div>
-            <div className="floating-clue clue-signal"><span><Radio size={13}/> CAMERA LOG</span><b>21:40 · SIGNAL LOST</b></div>
-            <div className="visual-caption"><span>AN ATMOSPHERE BUILT AROUND YOUR STORY</span><span>NO. 01 / 03</span></div>
+            <div className="floating-clue clue-message"><b>“I never left the west wing.”</b></div>
+            <div className="floating-clue clue-signal"><b>21:40 · Camera signal lost</b></div>
           </div>
-          <div className="hero-index">01 <span>—</span> 03</div>
         </section>
 
         <section className="ticker" aria-label="Investigation steps">
-          <span>LOOK CLOSER</span><i>✳</i><span>QUESTION EVERYTHING</span><i>✳</i><span>FOLLOW THE TRACE</span><i>✳</i><span>NAME THE TRUTH</span>
+          <span>Create</span><i>·</i><span>Investigate</span><i>·</i><span>Accuse</span>
         </section>
 
         <section id="how-it-works" className="process section-wrap">
-          <div className="section-kicker">YOUR INVESTIGATION BEGINS HERE <span>01 — 03</span></div>
+          <div className="section-kicker">HOW IT WORKS</div>
           <div className="process-head">
-            <h2>One seed.<br/><em>A thousand shadows.</em></h2>
-            <p>Every case begins with your idea. Follow the evidence, trust your instincts, and decide who you believe before the room goes quiet.</p>
+            <h2>Three steps<br/>to <em>the truth.</em></h2>
+            <p>Start with a story idea. Explore the evidence. Make your final accusation.</p>
           </div>
           <div className="steps">
             <article><span className="step-no">01</span><Sparkles/><h3>Set the scene</h3><p>A person, a place, a feeling that something is wrong. That’s enough to begin.</p></article>
             <article><span className="step-no">02</span><Fingerprint/><h3>Study what’s left</h3><p>Meet the suspects. Turn over every clue. Notice what does not belong.</p></article>
             <article><span className="step-no">03</span><BadgeCheck/><h3>Make your accusation</h3><p>Commit to your theory. When the lights return, see if the evidence agrees.</p></article>
           </div>
-          <div className="process-bottom"><span>NOTHING IN THE FILE IS THERE BY ACCIDENT.</span><Link to="/create">Begin an investigation <ArrowRight size={15}/></Link></div>
+          <div className="process-bottom"><span>Your choices shape the case.</span><Link to="/create">Start a case <ArrowRight size={15}/></Link></div>
         </section>
 
         <section className="evidence-preview">
           <div className="preview-copy">
-            <Eyebrow>THE EVIDENCE BOARD</Eyebrow>
-            <h2>A whisper.<br/>A <em>missing minute.</em></h2>
-            <p>Messages, witness accounts, a camera log that cuts out at the worst possible moment. Each detail is a thread. Decide which ones to pull.</p>
-            <Link to="/create" className="text-link">Build a case around your idea <ArrowRight size={16}/></Link>
+            <Eyebrow>FOLLOW THE CLUES</Eyebrow>
+            <h2>Every detail<br/>can change <em>the story.</em></h2>
+            <p>Read statements, check the timeline, and open evidence for more detail before you accuse.</p>
+            <Link to="/create" className="text-link">Make your own case <ArrowRight size={16}/></Link>
           </div>
           <div className="preview-cards" aria-label="Examples of fictional clues">
-            <article className="preview-card card-note"><span className="card-label"><MessageSquare size={13}/> MESSAGE LOG <i>ITEM 02</i></span><p>“I thought the east door was still locked.”</p><small>UNSENT · 9:14 PM</small></article>
-            <article className="preview-card card-log"><span className="card-label"><Video size={13}/> SIMULATED CAMERA LOG <i>ITEM 05</i></span><div className="log-row"><i/>21:32:08 <span>Hallway clear</span></div><div className="log-row"><i/>21:40:51 <span>Motion detected</span></div><div className="log-row faded"><i/>21:42:16 <span>Signal restored</span></div></article>
-            <article className="preview-card card-evidence"><span className="card-label"><FileText size={13}/> CONSERVATION NOTE <i>ITEM 07</i></span><p>Varnish sample inconsistent with the restoration log dated Tuesday.</p><div className="doc-line"/><div className="doc-line short"/></article>
+            <article className="preview-card card-note"><span className="card-label"><MessageSquare size={13}/> WITNESS NOTE</span><p>“I thought the east door was still locked.”</p><small>9:14 PM</small></article>
+            <article className="preview-card card-log"><span className="card-label"><Video size={13}/> CAMERA LOG</span><div className="log-row"><i/>21:32 <span>Hallway clear</span></div><div className="log-row"><i/>21:40 <span>Signal lost</span></div></article>
           </div>
         </section>
 
         <section className="final-cta">
-          <Eyebrow>YOUR CASE IS WAITING</Eyebrow>
-          <h2>Have a story that<br/>doesn’t <em>let you sleep?</em></h2>
-          <Link to="/create" className="button button-primary">Put it to the test <ArrowRight size={17}/></Link>
-          <span className="cta-note"><LockKeyhole size={13}/> Private to your browser session · Fictional by design</span>
+          <Eyebrow>READY TO PLAY?</Eyebrow>
+          <h2>Make a mystery<br/>from <em>your idea.</em></h2>
+          <Link to="/create" className="button button-primary">Start creating <ArrowRight size={17}/></Link>
+          <span className="cta-note"><LockKeyhole size={13}/> Fictional, private, and made for play.</span>
         </section>
       </main>
       <FictionNotice/>
@@ -204,17 +197,16 @@ function CreateCasePage() {
       <main className="create-page">
         <aside className="create-aside">
           <Link to="/" className="back-link"><ArrowLeft size={14}/> BACK TO THE ROOM</Link>
-          <div className="create-scene"><SceneArtwork scene={scene} compact/><div className="scene-caption"><Eye size={13}/> THE SCENE WILL TAKE SHAPE AROUND YOUR WORDS</div></div>
+          <div className="create-scene"><SceneArtwork scene={scene} compact/></div>
           <Eyebrow>THE BEGINNING OF A CASE</Eyebrow>
           <h1>Leave us<br/>the <em>first clue.</em></h1>
           <p>Start with a premise. We’ll build a complete fictional investigation around it.</p>
           <div className="aside-note"><span className="note-icon"><Shield size={17}/></span><div><b>Fiction from the first line.</b><span>Your seed is treated as story material. Names, places, and evidence are invented.</span></div></div>
-          <div className="aside-steps"><span><i>01</i> Write the seed</span><span><i>02</i> Choose the mood</span><span><i>03</i> Enter the dark</span></div>
         </aside>
 
         <form className="create-form" onSubmit={submit}>
           <div className="form-head"><span>CASE CREATION <i>·</i> STEP 01</span><span className="required-label">* REQUIRED</span></div>
-          <label htmlFor="seed">Your story seed <span>What happened?</span></label>
+          <div className="seed-label-row"><label htmlFor="seed">Your story idea</label><button className="sample-seed-button" type="button" onClick={() => setSeed("During a storm, a handwritten map disappears from a locked lighthouse. Three people were inside, and each remembers the final hour differently.")}>Try a sample story <Sparkles size={13}/></button></div>
           <textarea id="seed" value={seed} onChange={event => setSeed(event.target.value)} placeholder="A celebrated botanist vanishes during the opening night of a greenhouse that only blooms after dark…" maxLength={1000} aria-describedby="seed-help seed-count"/>
           <div className="textarea-foot"><small id="seed-help">A person, a place, or the thing that feels wrong.</small><span id="seed-count" className={trimmedLength > 1000 ? "over" : ""}>{seed.length}<i> / 1,000</i></span></div>
           {trimmedLength > 0 && trimmedLength < 30 && <p className="field-error">Give the mystery a little more room — at least 30 characters.</p>}
@@ -344,27 +336,26 @@ function CaseRoom() {
   return (
     <Layout>
       <main className={`investigation scene-theme scene-theme--${scene}`}>
-        <div className="case-top"><Link to="/" className="back-link"><ArrowLeft size={14}/> EXIT CASE</Link><span className="case-status"><i aria-hidden="true"/>{result ? "CASE CLOSED" : "INVESTIGATION OPEN"}</span><span className="case-number">FILE / {id.slice(-6).toUpperCase()}</span></div>
+        <div className="case-top"><Link to="/" className="back-link"><ArrowLeft size={14}/> HOME</Link><span className="case-status"><i aria-hidden="true"/>{result ? "Case closed" : "Investigation open"}</span></div>
         <section className="case-heading">
           <div className="case-heading__art"><SceneArtwork scene={scene} compact/></div>
-          <div className="case-heading__content"><Eyebrow><span>{caseData.setting.toUpperCase()}</span><b>/</b><span>{caseData.difficulty.toUpperCase()} CASE</span></Eyebrow><h1>{caseData.title}</h1><p>{caseData.briefing.incident}</p><div className="case-location"><MapPin size={13}/>{caseData.briefing.location}<span>·</span>{caseData.briefing.timeWindow}</div></div>
-          <div className="case-heading__seal"><Eye size={15}/><span>FICTIONAL<br/>CASE MATERIAL</span></div>
+          <div className="case-heading__content"><Eyebrow>{caseData.setting}</Eyebrow><h1>{caseData.title}</h1><p>{caseData.briefing.incident}</p><div className="case-location"><MapPin size={13}/>{caseData.briefing.location}<span>·</span>{caseData.briefing.timeWindow}</div></div>
         </section>
 
         {result ? <ResultReveal result={result} caseData={caseData}/> : (
           <div className="case-columns">
             <div className="case-main">
-              <section className="case-brief dossier-panel"><SectionLabel detail="01">THE BRIEFING</SectionLabel><ul>{caseData.briefing.knownFacts.map((fact, index) => <li key={`${index}-${fact}`}><span>{String(index + 1).padStart(2, "0")}</span>{fact}</li>)}</ul></section>
-              <section className="suspects dossier-panel"><SectionLabel detail={`${String(caseData.suspects.length).padStart(2, "0")} PERSONS`}>PERSONS OF INTEREST</SectionLabel><div className="suspect-list">{caseData.suspects.map((suspect, index) => {
+              <section className="case-brief dossier-panel"><SectionLabel>THE BRIEFING</SectionLabel><ul>{caseData.briefing.knownFacts.map((fact, index) => <li key={`${index}-${fact}`}><span>{String(index + 1).padStart(2, "0")}</span>{fact}</li>)}</ul></section>
+              <section className="suspects dossier-panel"><SectionLabel>Suspects</SectionLabel><div className="suspect-list">{caseData.suspects.map((suspect, index) => {
                 const isSelected = selected === suspect.id;
                 return <article className={`suspect-card${isSelected ? " suspect-card--selected" : ""}`} key={suspect.id}><div className="suspect-card__top"><span className="suspect-no">0{index + 1}</span><button className="suspect-select" type="button" onClick={() => setSelected(isSelected ? "" : suspect.id)} aria-pressed={isSelected} aria-label={`${isSelected ? "Remove" : "Select"} ${suspect.name} for accusation`}>{isSelected ? <Check size={14}/> : <ArrowUpRight size={14}/>}</button></div><h3>{suspect.name}</h3><span className="suspect-role">{suspect.role}</span><p>{suspect.profile}</p><div className="alibi"><span>STATED ALIBI</span>{suspect.alibi}</div></article>;
               })}</div></section>
-              <section className="timeline dossier-panel"><SectionLabel detail={`${caseData.timeline.length} EVENTS`}>THE TIMELINE</SectionLabel><div className="timeline-list">{caseData.timeline.map((event, index) => <article className="timeline-row" key={event.id}><span className="timeline-time">{event.timestamp}</span><span className="timeline-node" aria-hidden="true"><i/></span><p>{event.description}</p><span className="timeline-index">0{index + 1}</span></article>)}</div></section>
+              <section className="timeline dossier-panel"><SectionLabel>Timeline</SectionLabel><div className="timeline-list">{caseData.timeline.map((event, index) => <article className="timeline-row" key={event.id}><span className="timeline-time">{event.timestamp}</span><span className="timeline-node" aria-hidden="true"><i/></span><p>{event.description}</p><span className="timeline-index">0{index + 1}</span></article>)}</div></section>
             </div>
 
             <aside className="case-sidebar">
-              <section className="evidence-board dossier-panel"><SectionLabel detail={`${String(caseData.evidence.length).padStart(2, "0")} ITEMS`}>EVIDENCE BOARD</SectionLabel><p className="board-hint">Every detail is a thread. Pull carefully.</p>{caseData.evidence.map((item, index) => {const Icon = evidenceIcons[item.type];return <button className="evidence-card" key={item.id} onClick={() => setEvidence(item)}><span className="evidence-index">{String(index + 1).padStart(2, "0")}</span><span className="evidence-icon"><Icon size={16}/></span><span className="evidence-content"><b>{item.title}</b><small>{item.sourceLabel}</small></span><ArrowUpRight className="evidence-open" size={15}/></button>;})}</section>
-              <section className="accusation dossier-panel"><SectionLabel detail="ONE FINAL CHOICE">YOUR THEORY</SectionLabel><p>Who had the motive, the access, and the opportunity?</p><div className="select-wrap"><select aria-label="Select a suspect to accuse" value={selected} onChange={event => setSelected(event.target.value)}><option value="">Choose a person of interest</option>{caseData.suspects.map(suspect => <option key={suspect.id} value={suspect.id}>{suspect.name} — {suspect.role}</option>)}</select><ChevronDown size={15}/></div>{error && <div className="error-box" role="alert">{error}</div>}<button className="button button-primary accuse-btn" type="button" disabled={!selected || busy} onClick={() => setConfirm(true)}>Lock in your accusation <ArrowRight size={16}/></button><small className="final-note"><LockKeyhole size={12}/> This choice is final for this case.</small></section>
+              <section className="evidence-board dossier-panel"><SectionLabel>Evidence</SectionLabel><p className="board-hint">Open a clue to inspect it.</p>{caseData.evidence.map((item, index) => {const Icon = evidenceIcons[item.type];return <button className="evidence-card" key={item.id} onClick={() => setEvidence(item)}><span className="evidence-index">{String(index + 1).padStart(2, "0")}</span><span className="evidence-icon"><Icon size={16}/></span><span className="evidence-content"><b>{item.title}</b><small>{item.sourceLabel}</small></span><ArrowUpRight className="evidence-open" size={15}/></button>;})}</section>
+              <section className="accusation dossier-panel"><SectionLabel>Your accusation</SectionLabel><p>Who do you think did it?</p><div className="select-wrap"><select aria-label="Select a suspect to accuse" value={selected} onChange={event => setSelected(event.target.value)}><option value="">Choose a suspect</option>{caseData.suspects.map(suspect => <option key={suspect.id} value={suspect.id}>{suspect.name} — {suspect.role}</option>)}</select><ChevronDown size={15}/></div>{error && <div className="error-box" role="alert">{error}</div>}<button className="button button-primary accuse-btn" type="button" disabled={!selected || busy} onClick={() => setConfirm(true)}>Review accusation <ArrowRight size={16}/></button><small className="final-note"><LockKeyhole size={12}/> You can only accuse once.</small></section>
             </aside>
           </div>
         )}
