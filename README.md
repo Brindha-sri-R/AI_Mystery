@@ -1,3 +1,67 @@
+# AI Mystery Room
+
+AI Mystery Room is a fictional detective game. Players create a mystery from a short story seed, review a case briefing, suspects, timeline, and evidence, then make one final accusation to reveal the solution.
+
+> Every case, person, and piece of evidence is fictional and generated for entertainment.
+
+## Contents
+
+- [Features](#features)
+- [Technology](#technology)
+- [Project structure](#project-structure)
+- [Requirements](#requirements)
+- [Run locally](#run-locally)
+- [Environment variables](#environment-variables)
+- [Build and test](#build-and-test)
+- [Deploy to Vercel](#deploy-to-vercel)
+- [API](#api)
+- [Troubleshooting](#troubleshooting)
+- [Privacy and security](#privacy-and-security)
+
+## Features
+
+- Generate a mystery using a story seed, setting, tone, and difficulty.
+- Investigate four to six suspects, a timeline, and six to ten evidence items.
+- Submit one final accusation and see whether it is correct, with the case solution.
+- Keep the culprit and solution private until the accusation is submitted.
+- Save cases in MongoDB and associate them with an anonymous browser session.
+
+## Technology
+
+- **Client:** React, TypeScript, Vite, React Router, Tailwind CSS
+- **API:** Node.js, Express, TypeScript, Zod, Mongoose
+- **AI generation:** Google Gemini through `@google/genai` (server side)
+- **Database:** MongoDB
+- **Shared contracts:** TypeScript and Zod schemas in the `shared` workspace
+- **Hosting:** Vercel Services, with the Vite client and Express API deployed together
+
+## Project structure
+
+```text
+client/       React application
+server/       Express API, Gemini case generator, MongoDB models
+shared/       Shared request and response schemas and types
+vercel.json   Vercel Services and public routing configuration
+```
+
+## Requirements
+
+- Node.js 22.x and npm
+- A MongoDB database, either local or MongoDB Atlas
+- A Gemini API key for mystery generation
+
+## Run locally
+
+Run commands from the repository root.
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Copy `.env.example` to `.env` and fill in the required values. See [Environment variables](#environment-variables).
+
    PowerShell:
 
    ```powershell
