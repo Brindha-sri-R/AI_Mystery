@@ -20,15 +20,6 @@ const evidenceIcons: Record<EvidenceType, LucideIcon> = {
   document: FileText,
 };
 
-const evidenceOptions: {id: EvidenceType; label: string; icon: LucideIcon}[] = [
-  {id: "chat", label: "Messages", icon: MessageSquare},
-  {id: "cctv_log", label: "Camera logs", icon: Video},
-  {id: "image", label: "Still images", icon: ImageIcon},
-  {id: "witness", label: "Witnesses", icon: UserRound},
-  {id: "physical", label: "Physical clues", icon: Fingerprint},
-  {id: "document", label: "Documents", icon: FileText},
-];
-
 const wait = (duration: number) => new Promise(resolve => window.setTimeout(resolve, duration));
 
 function Brand() {
@@ -160,15 +151,10 @@ function CreateCasePage() {
   const [setting, setSetting] = useState("Let AI decide");
   const [tone, setTone] = useState("Psychological suspense");
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
-  const [preferences, setPreferences] = useState<EvidenceType[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const scene = useMemo(() => resolveScene(`${seed} ${setting}`), [seed, setting]);
   const trimmedLength = seed.trim().length;
-
-  function togglePreference(value: EvidenceType) {
-    setPreferences(current => current.includes(value) ? current.filter(item => item !== value) : [...current, value]);
-  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,7 +167,7 @@ function CreateCasePage() {
         setting,
         tone,
         difficulty,
-        evidencePreferences: preferences,
+        evidencePreferences: [],
       });
       sessionStorage.setItem(`case:${createdCase.id}`, JSON.stringify(createdCase));
       await wait(700);
@@ -217,8 +203,6 @@ function CreateCasePage() {
           </div>
 
           <fieldset className="difficulty-field"><legend>Difficulty <span>How closely will you need to look?</span></legend><div className="difficulty-options">{([["easy", "A few guiding lights"], ["medium", "A fair challenge"], ["hard", "Every detail matters"]] as const).map(([value, description]) => <button className={difficulty === value ? "difficulty active" : "difficulty"} type="button" onClick={() => setDifficulty(value)} key={value} aria-pressed={difficulty === value}><span>{value}</span><small>{description}</small>{difficulty === value && <Check size={13}/>}</button>)}</div></fieldset>
-
-          <fieldset className="evidence-field"><legend>What should the evidence feel like? <span>Optional · choose any</span></legend><div className="evidence-preferences">{evidenceOptions.map(({id, label, icon: Icon}) => <button className={preferences.includes(id) ? "preference-chip selected" : "preference-chip"} type="button" key={id} onClick={() => togglePreference(id)} aria-pressed={preferences.includes(id)}><Icon size={14}/>{label}</button>)}</div></fieldset>
 
           {error && <div className="error-box" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
           <button disabled={busy || trimmedLength < 30 || trimmedLength > 1000} className="button button-primary form-submit" type="submit">{busy ? <><span className="spinner"/> The case is opening…</> : <>Enter the dark <ArrowRight size={17}/></>}</button>
