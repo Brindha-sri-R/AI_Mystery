@@ -4,12 +4,12 @@
     "client": {
       "root": "client",
       "framework": "vite",
-      "buildCommand": "cd .. && npm run build --workspace shared && cd client && npm run build"
+      "buildCommand": "npm run build --workspace client"
     },
     "server": {
       "root": "server",
       "framework": "express",
-      "buildCommand": "cd .. && npm run build --workspace shared && cd server && npm run build"
+      "buildCommand": "npm run build --workspace server"
     }
   },
   "rewrites": [
