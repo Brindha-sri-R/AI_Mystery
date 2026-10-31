@@ -5,6 +5,7 @@ node_modules/
 **/node_modules/
 dist/
 **/dist/
+**/dist-cjs/
 coverage/
 *.log
 .DS_Store
